@@ -48,6 +48,13 @@ pub mod v3 {
         #[serde(flatten, skip_serializing_if = "Option::is_none")]
         #[deprecated = "Since Matrix Client-Server API r0.6.0."]
         pub identity_server_info: Option<IdentityServerInfo>,
+
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub captcha_token: Option<String>,
+
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub captcha_code: Option<String>,
+
     }
 
     /// Response type for the `request_3pid_management_token_via_msisdn` endpoint.
@@ -87,8 +94,33 @@ pub mod v3 {
                 send_attempt,
                 next_link: None,
                 identity_server_info: None,
+                captcha_token:None,
+                captcha_code: None
             }
         }
+
+        #[allow(deprecated)]
+        pub fn new_v2(
+            client_secret: OwnedClientSecret,
+            country: String,
+            phone_number: String,
+            send_attempt: UInt,
+            captcha_token: Option<String>,
+            captcha_code: Option<String>
+        ) -> Self {
+            Self {
+                client_secret,
+                country,
+                phone_number,
+                send_attempt,
+                next_link: None,
+                identity_server_info: None,
+                captcha_token:captcha_token,
+                captcha_code: captcha_code
+            }
+        }
+
+        //
     }
 
     impl Response {
