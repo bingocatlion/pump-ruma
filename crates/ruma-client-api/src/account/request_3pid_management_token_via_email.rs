@@ -51,6 +51,9 @@ pub mod v3 {
 
         #[serde(skip_serializing_if = "Option::is_none")]
         pub captcha_code: Option<String>,
+
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub mobile: Option<bool>,
     }
 
     /// Response type for the `request_3pid_management_token_via_email` endpoint.
@@ -77,12 +80,12 @@ pub mod v3 {
         /// Creates a new `Request` with the client secret, email and send-attempt counter.
         #[allow(deprecated)]
         pub fn new(client_secret: OwnedClientSecret, email: String, send_attempt: UInt) -> Self {
-            Self { client_secret, email, send_attempt, next_link: None, identity_server_info: None ,captcha_token:None, captcha_code: None}
+            Self { client_secret, email, send_attempt, next_link: None, identity_server_info: None ,captcha_token:None, captcha_code: None,mobile:None}
         }
 
         #[allow(deprecated)]
-        pub fn new_v2(client_secret: OwnedClientSecret, email: String, send_attempt: UInt,captcha_token: Option<String>,captcha_code: Option<String>) -> Self {
-            Self { client_secret, email, send_attempt, next_link: None, identity_server_info: None ,captcha_token:captcha_token, captcha_code: captcha_code}
+        pub fn new_v2(client_secret: OwnedClientSecret, email: String, send_attempt: UInt,captcha_token: Option<String>,captcha_code: Option<String>,mobile:Option<bool>) -> Self {
+            Self { client_secret, email, send_attempt, next_link: None, identity_server_info: None ,captcha_token:captcha_token, captcha_code: captcha_code,mobile:mobile}
         }
     }
 

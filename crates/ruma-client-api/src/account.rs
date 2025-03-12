@@ -19,6 +19,7 @@ pub mod request_registration_token_via_msisdn;
 pub mod unbind_3pid;
 pub mod whoami;
 pub mod get_image_captcha;
+pub mod request_submit_token;
 
 use ruma_common::serde::StringEnum;
 use serde::{Deserialize, Serialize};

@@ -8,8 +8,6 @@ pub mod v3 {
         metadata,
     };
 
-    use crate::uiaa::{AuthData, UiaaResponse};
-
     const METADATA: Metadata = metadata! {
         method: GET,
         rate_limited: true,
@@ -34,7 +32,7 @@ pub mod v3 {
         pub token:String,
     }
 
-    impl crate::account::get_image_captcha::v3::Request {
+    impl Request {
         /// Creates a new `Request` with the given client secret and session identifier.
         pub fn new(number:String) -> Self {
             Self {
@@ -43,7 +41,7 @@ pub mod v3 {
         }
     }
 
-    impl crate::account::get_image_captcha::v3::Response {
+    impl Response {
         /// Creates an empty `Response`.
         pub fn new(image:String,token:String) -> Self {
             Self {token: token,image:image}

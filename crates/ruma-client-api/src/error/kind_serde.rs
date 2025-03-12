@@ -163,6 +163,9 @@ impl<'de> Visitor<'de> for ErrorKindVisitor {
         let extra = Extra(extra);
 
         Ok(match errcode {
+            ErrorCode::EmailTokenVerifyFailed => ErrorKind::EmailTokenVerifyFailed,
+            ErrorCode::MustTokenCaptcha => ErrorKind::MustTokenCaptcha,
+            ErrorCode::RegisterTokenCaptcha => ErrorKind::RegisterTokenCaptcha,
             ErrorCode::BadAlias => ErrorKind::BadAlias,
             ErrorCode::BadJson => ErrorKind::BadJson,
             ErrorCode::BadState => ErrorKind::BadState,
