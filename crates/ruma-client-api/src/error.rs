@@ -386,6 +386,16 @@ pub enum ErrorKind {
         current_version: Option<String>,
     },
 
+    /// `M_MUST_TOKEN_CAPTCHA`
+    MustTokenCaptcha,
+    // `M_REGISTER_TOKEN_CAPTCHA` 
+    /// captcha vaild failed
+    RegisterTokenCaptcha,
+
+    /// `M_EMAIL_TOKEN_VERIFY_FAILED`
+    /// verifyication token faild
+    EmailTokenVerifyFailed,
+
     #[doc(hidden)]
     _Custom { errcode: PrivOwnedStr, extra: Extra },
 }
@@ -409,6 +419,9 @@ impl ErrorKind {
     /// Get the [`ErrorCode`] for this `ErrorKind`.
     pub fn errcode(&self) -> ErrorCode {
         match self {
+            ErrorKind::EmailTokenVerifyFailed => ErrorCode::EmailTokenVerifyFailed,
+            ErrorKind::MustTokenCaptcha => ErrorCode::MustTokenCaptcha,
+            ErrorKind::RegisterTokenCaptcha => ErrorCode::RegisterTokenCaptcha,
             ErrorKind::BadAlias => ErrorCode::BadAlias,
             ErrorKind::BadJson => ErrorCode::BadJson,
             ErrorKind::BadState => ErrorCode::BadState,
@@ -460,6 +473,8 @@ impl ErrorKind {
             ErrorKind::UserSuspended => ErrorCode::UserSuspended,
             ErrorKind::WeakPassword => ErrorCode::WeakPassword,
             ErrorKind::WrongRoomKeysVersion { .. } => ErrorCode::WrongRoomKeysVersion,
+            ErrorKind::MustTokenCaptcha => ErrorCode::MustTokenCaptcha,
+            ErrorKind::RegisterTokenCaptcha => ErrorCode::RegisterTokenCaptcha,
             ErrorKind::_Custom { errcode, .. } => errcode.0.clone().into(),
         }
     }
@@ -795,6 +810,15 @@ pub enum ErrorCode {
     /// [room keys backup]: https://spec.matrix.org/latest/client-server-api/#server-side-key-backups
     WrongRoomKeysVersion,
 
+    /// `M_MUST_TOKEN_CAPTCHA`
+    MustTokenCaptcha,
+    // `M_REGISTER_TOKEN_CAPTCHA` 
+    /// captcha vaild failed
+    RegisterTokenCaptcha,
+
+    /// `M_EMAIL_TOKEN_VERIFY_FAILED`
+    EmailTokenVerifyFailed,
+       
     #[doc(hidden)]
     _Custom(PrivOwnedStr),
 }

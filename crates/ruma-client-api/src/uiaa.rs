@@ -102,6 +102,9 @@ impl AuthData {
         })
     }
 
+    pub fn new_email( auth_type: &str,email_identity: EmailIdentity) -> Self {
+        Self::EmailIdentity(email_identity)
+    }
     /// Creates a new `AuthData::FallbackAcknowledgement` with the given session key.
     pub fn fallback_acknowledgement(session: String) -> Self {
         Self::FallbackAcknowledgement(FallbackAcknowledgement::new(session))
@@ -355,6 +358,12 @@ pub struct EmailIdentity {
 
     /// The value of the session key given by the homeserver, if any.
     pub session: Option<String>,
+}
+
+impl EmailIdentity {
+    pub fn new(thirdparty_id_creds:ThirdpartyIdCredentials, session: Option<String>) -> Self {
+        Self { thirdparty_id_creds, session }
+    }
 }
 
 /// Data for phone number-based UIAA flow.
