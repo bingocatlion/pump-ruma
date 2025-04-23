@@ -33,6 +33,7 @@ pub struct SpaceParentEventContent {
     pub unsigned:Option<SpaceParentEventContentUnsigned>,
 }
 
+
 #[derive(Clone, Debug, Default, Deserialize,Serialize)]
 #[cfg_attr(not(ruma_unstable_exhaustive_types), non_exhaustive)]
 pub struct SpaceParentEventContentUnsignedPrveContent {
@@ -59,6 +60,29 @@ impl SpaceParentEventContent {
     /// Creates a new `SpaceParentEventContent` with the given routing servers.
     pub fn new(via: Vec<OwnedServerName>) -> Self {
         Self { via:Some(via), canonical: Some(false),unsigned:None }
+    }
+    pub fn is_empty(&self) -> bool {
+       let empty = self.via.is_none()
+            &&
+            self.canonical.is_none()
+            && self.unsigned.is_none();
+        let empty2 = self.via.as_ref().is_some_and(|v| v.is_empty())
+            && self.unsigned.as_ref().is_some_and(|v|
+            v.prev_content.via.is_none() || v.prev_content.via.as_ref().is_some_and(|v| v.is_empty()));
+        return empty && empty2;
+    }
+
+    pub fn get_via(&self) -> Vec<String> {
+        self.via.as_ref().map_or(
+            self.unsigned.as_ref().map_or(Vec::new(),|m|
+                m.prev_content.via.as_ref().map_or(Vec::new(),|v| {
+                    v.iter().map(|id| id.to_string()).collect()
+                })),|v|  v.iter().map(|id| id.to_string()).collect() )
+    }
+
+    pub fn get_canonical(&self) -> bool {
+        self.canonical.map_or(self.unsigned.as_ref().map_or(false,|v| v.prev_content.canonical.map_or(false,|v| v))
+        ,|v| v)
     }
 }
 
@@ -87,6 +111,10 @@ mod tests {
         println!("json string1 {:?}", &raw_value);
         let values = raw_value.unwrap().deserialize();
         println!("values {:?}", &values);
+        let zm = values.unwrap();
+        println!("via {:?}", zm.get_via());
+        println!("empty {:?}", zm.is_empty());
+
     }
 
 }
