@@ -302,19 +302,3 @@ impl fmt::Debug for PrivOwnedStr {
         self.0.fmt(f)
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use ruma_common::serde::Raw;
-    use super::*;
-    #[test]
-    pub fn test_anyTimes(){
-
-            let textstr = r#"{"type":"m.space.parent","sender":"@abc3:testname","content":{},"state_key":"!ZxVlcfgIiXLNRrMcHx:testname","origin_server_ts":1743063313673,"unsigned":{"replaces_state":"$4C6A2d1sPIte1c491q-rLXrQWdOmdMNODV91_tEHm6I","prev_content":{"via":["testname"],"canonical":true},"prev_sender":"@abc3:testname","membership":"join","age":2330779998}}"#;
-            let raw_value =  Raw::<AnySyncTimelineEvent>::from_json_string(textstr.to_string());
-            println!("{:?}", raw_value);
-            let mz = raw_value.unwrap().deserialize();
-            println!("{:?}", mz);
-
-    }
-}
