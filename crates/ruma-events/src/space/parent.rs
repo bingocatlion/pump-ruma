@@ -52,7 +52,7 @@ pub struct SpaceParentEventContentUnsignedPrveContent {
 #[derive(Clone, Debug, Default, Deserialize,Serialize)]
 #[cfg_attr(not(ruma_unstable_exhaustive_types), non_exhaustive)]
 pub struct SpaceParentEventContentUnsigned {
-    prev_content:SpaceParentEventContentUnsignedPrveContent
+    pub prev_content:SpaceParentEventContentUnsignedPrveContent
 }
 
 impl SpaceParentEventContent {
