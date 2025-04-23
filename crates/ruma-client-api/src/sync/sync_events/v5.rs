@@ -836,6 +836,10 @@ mod tests {
     use super::request::ReceiptsRoom;
 
     #[test]
+    fn test_json(){
+        let json = r#""#;
+    }
+    #[test]
     fn serialize_request_receipts_room() {
         let entry = ReceiptsRoom::AllSubscribed;
         assert_eq!(serde_json::to_string(&entry).unwrap().as_str(), r#""*""#);

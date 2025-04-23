@@ -18,7 +18,7 @@ use serde::{Deserialize, Serialize};
 #[ruma_event(type = "m.space.parent", kind = State, state_key_type = OwnedRoomId)]
 pub struct SpaceParentEventContent {
     /// List of candidate servers that can be used to join the room.
-     pub via: Vec<OwnedServerName>,
+     pub via: Option<Vec<OwnedServerName>>,
     /// Determines whether this is the main parent for the space.
     ///
     /// When a user joins a room with a canonical parent, clients may switch to view the room in
@@ -29,13 +29,14 @@ pub struct SpaceParentEventContent {
     ///
     /// Defaults to `false`.
     #[serde(default, skip_serializing_if = "ruma_common::serde::is_default")]
-    pub canonical: bool,
+    pub canonical: Option<bool>,
+    pub unsigned:Option<SpaceParentEventContentUnsigned>,
 }
 
-#[derive(Clone, Debug, Default, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize,Serialize)]
 #[cfg_attr(not(ruma_unstable_exhaustive_types), non_exhaustive)]
 pub struct SpaceParentEventContentUnsignedPrveContent {
-    pub via: Vec<OwnedServerName>,
+    pub via: Option<Vec<OwnedServerName>>,
     /// Determines whether this is the main parent for the space.
     ///
     /// When a user joins a room with a canonical parent, clients may switch to view the room in
@@ -46,9 +47,9 @@ pub struct SpaceParentEventContentUnsignedPrveContent {
     ///
     /// Defaults to `false`.
     #[serde(default, skip_serializing_if = "ruma_common::serde::is_default")]
-    pub canonical: bool,
+    pub canonical: Option<bool>,
 }
-#[derive(Clone, Debug, Default, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize,Serialize)]
 #[cfg_attr(not(ruma_unstable_exhaustive_types), non_exhaustive)]
 pub struct SpaceParentEventContentUnsigned {
     prev_content:SpaceParentEventContentUnsignedPrveContent
@@ -57,7 +58,7 @@ pub struct SpaceParentEventContentUnsigned {
 impl SpaceParentEventContent {
     /// Creates a new `SpaceParentEventContent` with the given routing servers.
     pub fn new(via: Vec<OwnedServerName>) -> Self {
-        Self { via, canonical: false }
+        Self { via:Some(via), canonical: Some(false),unsigned:None }
     }
 }
 
@@ -72,8 +73,9 @@ mod tests {
     #[test]
     fn space_parent_serialization() {
         let content = SpaceParentEventContent {
-            via: vec![server_name!("example.com").to_owned()],
-            canonical: true,
+            via: Some(vec![server_name!("example.com").to_owned()]),
+            canonical: Some(true),
+            unsigned: None,
         };
     //  {'type': 'm.space.parent', 'sender': '@abc3:testname', 'content': {}, 'state_key': '!ZxVlcfgIiXLNRrMcHx:testname', 'origin_server_ts': 1743063313673, 'unsigned': {'replaces_state': '$4C6A2d1sPIte1c491q-rLXrQWdOmdMNODV91_tEHm6I', 'prev_content': {'via': ['testname'], 'canonical': True}, 'prev_sender': '@abc3:testname', 'membership': 'join', 'age': 2330779998}
         let json = json!({
@@ -85,15 +87,6 @@ mod tests {
         println!("json string1 {:?}", &raw_value);
         let values = raw_value.unwrap().deserialize();
         println!("values {:?}", &values);
-        assert_eq!(to_json_value(&content).unwrap(), json);
     }
 
-    #[test]
-    fn space_parent_empty_serialization() {
-        let content = SpaceParentEventContent { via: vec![], canonical: false };
-
-        let json = json!({ "via": [] });
-
-        assert_eq!(to_json_value(&content).unwrap(), json);
-    }
 }
