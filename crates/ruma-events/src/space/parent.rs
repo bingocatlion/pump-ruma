@@ -18,7 +18,7 @@ use serde::{Deserialize, Serialize};
 #[ruma_event(type = "m.space.parent", kind = State, state_key_type = OwnedRoomId)]
 pub struct SpaceParentEventContent {
     /// List of candidate servers that can be used to join the room.
-     pub via: Option<Vec<OwnedServerName>>,
+     pub via: Vec<OwnedServerName>,
     /// Determines whether this is the main parent for the space.
     ///
     /// When a user joins a room with a canonical parent, clients may switch to view the room in
@@ -29,60 +29,25 @@ pub struct SpaceParentEventContent {
     ///
     /// Defaults to `false`.
     #[serde(default, skip_serializing_if = "ruma_common::serde::is_default")]
-    pub canonical: Option<bool>,
-    pub unsigned:Option<SpaceParentEventContentUnsigned>,
-}
-
-
-#[derive(Clone, Debug, Default, Deserialize,Serialize)]
-#[cfg_attr(not(ruma_unstable_exhaustive_types), non_exhaustive)]
-pub struct SpaceParentEventContentUnsignedPrveContent {
-    pub via: Option<Vec<OwnedServerName>>,
-    /// Determines whether this is the main parent for the space.
-    ///
-    /// When a user joins a room with a canonical parent, clients may switch to view the room in
-    /// the context of that space, peeking into it in order to find other rooms and group them
-    /// together. In practice, well behaved rooms should only have one `canonical` parent, but
-    /// given this is not enforced: if multiple are present the client should select the one with
-    /// the lowest room ID, as determined via a lexicographic ordering of the Unicode code-points.
-    ///
-    /// Defaults to `false`.
-    #[serde(default, skip_serializing_if = "ruma_common::serde::is_default")]
-    pub canonical: Option<bool>,
-}
-#[derive(Clone, Debug, Default, Deserialize,Serialize)]
-#[cfg_attr(not(ruma_unstable_exhaustive_types), non_exhaustive)]
-pub struct SpaceParentEventContentUnsigned {
-    pub prev_content:SpaceParentEventContentUnsignedPrveContent
+    pub canonical: bool,
 }
 
 impl SpaceParentEventContent {
     /// Creates a new `SpaceParentEventContent` with the given routing servers.
     pub fn new(via: Vec<OwnedServerName>) -> Self {
-        Self { via:Some(via), canonical: Some(false),unsigned:None }
+        Self { via:via, canonical: false}
     }
     pub fn is_empty(&self) -> bool {
-       let empty = self.via.is_none()
-            &&
-            self.canonical.is_none()
-            && self.unsigned.is_none();
-        let empty2 = self.via.as_ref().is_some_and(|v| v.is_empty())
-            && self.unsigned.as_ref().is_some_and(|v|
-            v.prev_content.via.is_none() || v.prev_content.via.as_ref().is_some_and(|v| v.is_empty()));
-        return empty && empty2;
+       let empty = self.via.is_empty();
+        return empty;
     }
 
     pub fn get_via(&self) -> Vec<String> {
-        self.via.as_ref().map_or(
-            self.unsigned.as_ref().map_or(Vec::new(),|m|
-                m.prev_content.via.as_ref().map_or(Vec::new(),|v| {
-                    v.iter().map(|id| id.to_string()).collect()
-                })),|v|  v.iter().map(|id| id.to_string()).collect() )
+        self.via.iter().map(|id| id.to_string()).collect()
     }
 
     pub fn get_canonical(&self) -> bool {
-        self.canonical.map_or(self.unsigned.as_ref().map_or(false,|v| v.prev_content.canonical.map_or(false,|v| v))
-        ,|v| v)
+        self.canonical
     }
 }
 
@@ -97,9 +62,8 @@ mod tests {
     #[test]
     fn space_parent_serialization() {
         let content = SpaceParentEventContent {
-            via: Some(vec![server_name!("example.com").to_owned()]),
-            canonical: Some(true),
-            unsigned: None,
+            via: vec![server_name!("example.com").to_owned()],
+            canonical: true,
         };
     //  {'type': 'm.space.parent', 'sender': '@abc3:testname', 'content': {}, 'state_key': '!ZxVlcfgIiXLNRrMcHx:testname', 'origin_server_ts': 1743063313673, 'unsigned': {'replaces_state': '$4C6A2d1sPIte1c491q-rLXrQWdOmdMNODV91_tEHm6I', 'prev_content': {'via': ['testname'], 'canonical': True}, 'prev_sender': '@abc3:testname', 'membership': 'join', 'age': 2330779998}
         let json = json!({

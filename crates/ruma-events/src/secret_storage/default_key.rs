@@ -13,7 +13,7 @@ use crate::macros::EventContent;
 pub struct SecretStorageDefaultKeyEventContent {
     /// The ID of the default key.
     #[serde(rename = "key")]
-    pub key_id: String,
+    pub key_id: Option<String>,
 }
 
 impl SecretStorageDefaultKeyEventContent {
@@ -22,6 +22,6 @@ impl SecretStorageDefaultKeyEventContent {
     /// Uploading this to the account data will mark the secret storage key with the given key ID as
     /// the default key.
     pub fn new(key_id: String) -> Self {
-        Self { key_id }
+        Self { key_id:Some(key_id) }
     }
 }

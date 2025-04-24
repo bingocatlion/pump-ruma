@@ -550,6 +550,10 @@ pub mod response {
         /// Heroes of the room, if requested.
         #[serde(skip_serializing_if = "Option::is_none")]
         pub heroes: Option<Vec<Hero>>,
+
+        /// Space_id
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub space_id: Option<String>,
     }
 
     impl Room {
@@ -832,13 +836,10 @@ impl From<v4::Typing> for response::Typing {
 #[cfg(test)]
 mod tests {
     use ruma_common::owned_room_id;
-
+    use ruma_common::serde::Raw;
     use super::request::ReceiptsRoom;
+    use super::Response;
 
-    #[test]
-    fn test_json(){
-        let json = r#""#;
-    }
     #[test]
     fn serialize_request_receipts_room() {
         let entry = ReceiptsRoom::AllSubscribed;
