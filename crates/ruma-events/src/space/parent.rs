@@ -18,7 +18,7 @@ use serde::{Deserialize, Serialize};
 #[ruma_event(type = "m.space.parent", kind = State, state_key_type = OwnedRoomId)]
 pub struct SpaceParentEventContent {
     /// List of candidate servers that can be used to join the room.
-     pub via: Vec<OwnedServerName>,
+     pub via: Option<Vec<OwnedServerName>>,
     /// Determines whether this is the main parent for the space.
     ///
     /// When a user joins a room with a canonical parent, clients may switch to view the room in
@@ -29,25 +29,25 @@ pub struct SpaceParentEventContent {
     ///
     /// Defaults to `false`.
     #[serde(default, skip_serializing_if = "ruma_common::serde::is_default")]
-    pub canonical: bool,
+    pub canonical: Option<bool>,
 }
 
 impl SpaceParentEventContent {
     /// Creates a new `SpaceParentEventContent` with the given routing servers.
     pub fn new(via: Vec<OwnedServerName>) -> Self {
-        Self { via:via, canonical: false}
+        Self { via:Some(via), canonical: Some(false) }
     }
     pub fn is_empty(&self) -> bool {
-       let empty = self.via.is_empty();
-        return empty;
+       let empty = self.via.is_none() || self.via.as_ref().is_some_and(|v| v.is_empty());
+        empty
     }
 
     pub fn get_via(&self) -> Vec<String> {
-        self.via.iter().map(|id| id.to_string()).collect()
+        self.via.as_ref().map_or(Vec::new(),|v| v.iter().map(|id| id.to_string()).collect())
     }
 
     pub fn get_canonical(&self) -> bool {
-        self.canonical
+        self.canonical.map_or(false, |canonical| canonical)
     }
 }
 
@@ -62,8 +62,8 @@ mod tests {
     #[test]
     fn space_parent_serialization() {
         let content = SpaceParentEventContent {
-            via: vec![server_name!("example.com").to_owned()],
-            canonical: true,
+            via: Some(vec![server_name!("example.com").to_owned()]),
+            canonical: Some(true),
         };
     //  {'type': 'm.space.parent', 'sender': '@abc3:testname', 'content': {}, 'state_key': '!ZxVlcfgIiXLNRrMcHx:testname', 'origin_server_ts': 1743063313673, 'unsigned': {'replaces_state': '$4C6A2d1sPIte1c491q-rLXrQWdOmdMNODV91_tEHm6I', 'prev_content': {'via': ['testname'], 'canonical': True}, 'prev_sender': '@abc3:testname', 'membership': 'join', 'age': 2330779998}
         let json = json!({
