@@ -7,24 +7,22 @@ pub mod v0 {
 
     const METADATA: Metadata = metadata! {
         method: POST,
-        rate_limited: true,
-        authentication: AccessToken,
+        rate_limited: false,
+        authentication: None,
         history: {
-            1.0 => "/v0/sdk/api/user/room/none/create",
+            1.0 => "/v0/sdk/api/user/room/none/join",
         }
     };
     #[request(error =  crate::Error)]
     pub struct Request{
-        pub name:String,
-        pub topic:Option<String>,
+        pub room_id:String,
     }
 
     impl Request {
         /// Creates a new `Request` with the given client secret and session identifier.
-        pub fn new(name:String,topic:Option<String>) -> Self {
+        pub fn new(room_id:String) -> Self {
             Self {
-                name:name,
-                topic:topic,
+                room_id:room_id,
             }
         }
     }
@@ -33,7 +31,6 @@ pub mod v0 {
     #[derive(Default)]
     pub struct Response {
         pub room_id:String,
-        pub share_link:String,
     }
 
 }
