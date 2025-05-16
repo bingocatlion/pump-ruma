@@ -1,6 +1,5 @@
-pub mod v0 {
+pub mod v3 {
     use ruma_common::{
-
         api::{request, response, Metadata},
         metadata,
     };
@@ -10,7 +9,7 @@ pub mod v0 {
         rate_limited: false,
         authentication: None,
         history: {
-            1.0 => "/v0/sdk/api/index/room/none/join",
+            1.1 => "/_matrix/client/v3/anonymous/join",
         }
     };
     #[request(error =  crate::Error)]

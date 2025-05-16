@@ -1,4 +1,4 @@
-pub mod v0 {
+pub mod v3 {
     use ruma_common::{
 
         api::{request, response, Metadata},
@@ -6,15 +6,17 @@ pub mod v0 {
     };
 
     const METADATA: Metadata = metadata! {
-        method: POST,
+        method: GET,
         rate_limited: false,
         authentication: None,
         history: {
-            1.0 => "/v0/sdk/api/user/room/none/join",
+            1.1 => "/_matrix/client/v3/user/anonymous/join/:room_id",
         }
     };
+
     #[request(error =  crate::Error)]
     pub struct Request{
+        #[ruma_api(path)]
         pub room_id:String,
     }
 
